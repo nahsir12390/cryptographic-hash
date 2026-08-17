@@ -23,6 +23,11 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 COPY . /var/www/html
 
 ENV COMPOSER_PROCESS_TIMEOUT=900
+ENV DB_CONNECTION=sqlite
+ENV DB_DATABASE=/var/data/database.sqlite
+ENV CACHE_STORE=file
+ENV SESSION_DRIVER=file
+ENV QUEUE_CONNECTION=sync
 
 RUN mkdir -p /var/data \
     && mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views storage/logs bootstrap/cache \
@@ -30,7 +35,6 @@ RUN mkdir -p /var/data \
     && composer install --no-interaction --prefer-dist --no-progress --optimize-autoloader --no-dev \
     && npm ci \
     && npm run build \
-    && php artisan optimize:clear \
     && php artisan view:cache
 
 EXPOSE 8000
