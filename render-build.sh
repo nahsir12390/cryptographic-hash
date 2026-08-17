@@ -2,6 +2,7 @@
 set -e
 
 mkdir -p /var/data
+mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views storage/logs bootstrap/cache
 : > /var/data/database.sqlite
 
 for i in 1 2 3 4 5; do
@@ -17,6 +18,7 @@ done
 npm ci
 npm run build
 
+php artisan optimize:clear
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache

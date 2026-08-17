@@ -2,6 +2,7 @@
 set -eu
 
 mkdir -p /var/data
+mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views storage/logs bootstrap/cache
 touch /var/data/database.sqlite
 
 if [ ! -f .env ]; then

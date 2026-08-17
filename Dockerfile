@@ -25,10 +25,12 @@ COPY . /var/www/html
 ENV COMPOSER_PROCESS_TIMEOUT=900
 
 RUN mkdir -p /var/data \
+    && mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views storage/logs bootstrap/cache \
     && touch /var/data/database.sqlite \
     && composer install --no-interaction --prefer-dist --no-progress --optimize-autoloader --no-dev \
     && npm ci \
     && npm run build \
+    && php artisan optimize:clear \
     && php artisan view:cache
 
 EXPOSE 8000
