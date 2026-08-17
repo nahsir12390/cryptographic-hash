@@ -1,0 +1,48 @@
+services:
+  - type: web
+    name: cryptographic-hash-web
+    env: php
+    plan: free
+    buildCommand: |
+      chmod +x render-build.sh
+      ./render-build.sh
+    startCommand: |
+      sh ./scripts/render-start.sh
+    healthCheckPath: /
+    envVars:
+      - key: APP_NAME
+        value: Cryptographic Hash Visualizer
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: APP_KEY
+        generateValue: true
+      - key: APP_URL
+        value: https://your-service-name.onrender.com
+      - key: LOG_CHANNEL
+        value: stderr
+      - key: LOG_LEVEL
+        value: info
+      - key: DB_CONNECTION
+        value: sqlite
+      - key: DB_DATABASE
+        value: /var/data/database.sqlite
+      - key: SESSION_DRIVER
+        value: file
+      - key: SESSION_SECURE_COOKIE
+        value: true
+      - key: SESSION_SAME_SITE
+        value: lax
+      - key: CACHE_STORE
+        value: file
+      - key: QUEUE_CONNECTION
+        value: sync
+      - key: FILESYSTEM_DISK
+        value: local
+      - key: PHP_VERSION
+        value: 8.4
+    disk:
+      name: sqlite-data
+      mountPath: /var/data
+      sizeGB: 1
