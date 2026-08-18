@@ -25,6 +25,7 @@ write_env_key() {
 }
 
 mkdir -p /var/data
+mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views storage/logs bootstrap/cache
 touch /var/data/database.sqlite
 
 if [ ! -f .env ]; then
@@ -44,6 +45,7 @@ fi
 
 php artisan config:clear
 php artisan route:clear
+php artisan storage:link || true
 php artisan config:cache
 php artisan route:cache
 php artisan migrate --force
