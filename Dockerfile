@@ -12,31 +12,33 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     sqlite3 \
     libsqlite3-dev \
+    nodejs \
+    npm \
     zip \
-    && docker-php-ext-install pdo pdo_sqlite mbstring exif pcntl gd zip \
-    && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
-    && apt-get install -y nodejs \
-    && rm -rf /var/lib/apt/lists/*
+    && docker-php-ext-install pdo pdo_sqlite mbstring exif pcntl gd zip
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 COPY . /var/www/html
 
 ENV COMPOSER_PROCESS_TIMEOUT=900
-ENV DB_CONNECTION=sqlite
-ENV DB_DATABASE=/var/data/database.sqlite
-ENV CACHE_STORE=file
-ENV SESSION_DRIVER=file
-ENV QUEUE_CONNECTION=sync
 
 RUN mkdir -p /var/data \
-    && mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views storage/logs bootstrap/cache \
     && touch /var/data/database.sqlite \
-    && composer install --no-interaction --prefer-dist --no-progress --optimize-autoloader --no-dev \
-    && npm ci \
+    && for i in 1 2 3 4 5 6 7 8; do \
+        composer install --no-interaction --prefer-source --no-progress --optimize-autoloader --no-dev && break || { \
+            if [ "$i" -lt 8 ]; then \
+                echo "Composer install failed (attempt $i/8), retrying in $((i * 10))s..."; \
+                sleep $((i * 10)); \
+            else \
+                exit 1; \
+            fi; \
+        }; \
+    done \
+    && npm install \
     && npm run build \
     && php artisan view:cache
 
 EXPOSE 8000
 
-CMD ["sh", "./scripts/render-start.sh"]
+CMD ["sh", "./docker-start.sh"]
